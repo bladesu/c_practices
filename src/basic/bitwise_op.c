@@ -7,7 +7,7 @@
 void print_bit(void *const obj, unsigned long const bit_size)
 {
     // For bitwise AND operator,
-    //  dsthe each of operands shall have integer type according to C99 standard (6.5.10) 
+    // The each of operands shall have integer type according to C99 standard (6.5.10) 
     unsigned int *x = obj;
     unsigned long leftest = 8 * bit_size;
     while (leftest > 0)
