@@ -4,29 +4,17 @@ LDIR_STATIC=./library/static/
 LDIR_DYNAMIC=./library/dynamic/
 ODIR=./object
 
-# OS properties
-TOEXPORT=
-ifeq ($(OS),Windows_NT)
-    TOEXPORT ?= PATH="$$PATH:/$LDIR_DYNAMIC"
-else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Linux)
-        TOEXPORT ?= LD_LIBRARY_PATH="$$LD_LIBRARY_PATH:/$LDIR_DYNAMIC"
-    endif
-endif
-
-
 # library installed in OS
 LIBS=
 
 # compiler
 CC=gcc
 AR=ar
-CFLAGS=
+CFLAGS=-std=c99
 
 ## Add directory $(IDIR) to include search path
 ifneq ($(strip $(IDIR)),)
-CFLAGS=-I$(IDIR)
+CFLAGS+=-I$(IDIR)
 endif
 
 # Dependencies, $(IDIR) should contains all the files.
@@ -74,13 +62,12 @@ $(executable_dynamic_link_program): $(OBJ_LIST_MAIN) $(customized_dlib_fullname)
 
 .PHONY: build_static
 build_static:
-	mkdir -p $(LDIR_STATIC) $(ODIR)
+	@mkdir -p $(LDIR_STATIC) $(ODIR)
 	$(MAKE) -f $(this_file_name) $(executable_static_link_program)
 
 .PHONY: build_dynamic
 build_dynamic:
 	@mkdir -p $(LDIR_DYNAMIC) $(ODIR)
-	export $(TOEXPORT)
 	$(MAKE) -f $(this_file_name) $(executable_dynamic_link_program)
 
 .PHONY: build
@@ -95,6 +82,11 @@ run_static_exec: $(executable_static_link_program)
 .PHONY: run_dynamic_exec
 run_dynamic_exec: $(executable_dynamic_link_program) $(customized_dlib_fullname)
 	./$(executable_dynamic_link_program)
+
+.PHONY: run
+	$(MAKE) run_static_exec
+	$(MAKE) run_dynamic_exec
+
 .PHONY: clean
 clean:
 	rm -f $(ODIR)/*.o
